@@ -1,0 +1,27 @@
+
+rockpaperscissors.png
+size: 512,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+paper
+  rotate: false
+  xy: 2, 2
+  size: 160, 200
+  orig: 160, 200
+  offset: 0, 0
+  index: -1
+rock
+  rotate: false
+  xy: 326, 2
+  size: 160, 200
+  orig: 160, 200
+  offset: 0, 0
+  index: -1
+scissors
+  rotate: false
+  xy: 164, 2
+  size: 160, 200
+  orig: 160, 200
+  offset: 0, 0
+  index: -1
