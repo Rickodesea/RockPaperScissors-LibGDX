@@ -1,6 +1,6 @@
 package com.algodal.phase01.rps;
 
-import com.algodal.phase01.rps.GameState.DefaultGameState;
+import com.algodal.phase01.rps.State.DefaultGameState;
 import com.algodal.phase01.rps.utils.Position;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -19,7 +19,7 @@ public class Constants {
 	
 	private final static float size = 0.333f;
 	public final static int maxNumberOfHands = 3;
-	private final static float margin = (1f - (size * maxNumberOfHands)) / 6;
+	public final static float margin = (1f - (size * maxNumberOfHands)) / 6;
 	
 	public final static float handWidth = worldWidth * size;
 	public final static float handHeight = handWidth;
@@ -29,7 +29,7 @@ public class Constants {
 	public final static float fromBottom(float percentage) { return percentage * worldHeight - worldHeight / 2;}
 	public final static float fromRight(float percentage) { return -percentage * worldWidth + worldWidth / 2; }
 	
-	private final static float topRow = 0.25f, bottomRow = 0.50f;
+	private final static float topRow = 0.325f, bottomRow = 0.575f;
 	public final static Position[] handPositions = new Position[] {
 			new Position(fromLeft(margin+size/2), fromTop(bottomRow)),
 			new Position(0, fromTop(bottomRow)),

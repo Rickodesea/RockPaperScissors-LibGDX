@@ -1,13 +1,12 @@
 package com.algodal.phase01.rps;
 
 import static com.algodal.phase01.rps.Constants.defAtlas;
-import static com.algodal.phase01.rps.Constants.defScene;
 import static com.algodal.phase01.rps.Constants.defSkin;
 import static com.algodal.phase01.rps.Constants.gplScene;
 import static com.algodal.phase01.rps.Constants.worldHeight;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
-import com.algodal.phase01.rps.scenes.GamePlayScene;
+import com.algodal.phase01.rps.scenes.Play;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -24,8 +23,8 @@ import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -40,7 +39,7 @@ public class SubGame {
 	private final Vector2 v;
 	
 	private Scene scene;
-	private final ArrayMap<String, Scene> sceneMap;
+	private final Array<Scene> scenes;
 	
 	private final ArrayMap<String, AssetDescriptor<?>> adMap;
 	
@@ -52,6 +51,7 @@ public class SubGame {
 		am = new AssetManager();
 		st = new Stage(new FitViewport(worldWidth, worldHeight));
 		st.getViewport().getCamera().position.setZero();
+		st.setDebugAll(true);
 		
 		cc = new Color(Color.BROWN);
 		v = new Vector2();
@@ -60,10 +60,10 @@ public class SubGame {
 		adMap.put(defAtlas, new AssetDescriptor<TextureAtlas>(defAtlas, TextureAtlas.class));
 		adMap.put(defSkin, new AssetDescriptor<Skin>(defSkin, Skin.class));
 		
-		sceneMap = new ArrayMap<String, Scene>();
-		sceneMap.put(defScene, new DefaultScene());
-		sceneMap.put(gplScene, new GamePlayScene());
-		for(Entry<String, Scene> sceneEntry : sceneMap) sceneEntry.value.lateInitialize(this);
+		scenes = new Array<Scene>();
+		scenes.add(new DefaultScene());
+		scenes.add(new Play());
+		for(Scene scene : scenes) scene.lateInitialize(this);
 		
 		im = new InputMultiplexer(st, newIP(), newGD());
 		Gdx.input.setInputProcessor(im);
@@ -112,7 +112,7 @@ public class SubGame {
 		sb.setColor(Color.WHITE);
 	}
 	
-	public void draw(TextureRegion tr, GameObject o) {
+	public void draw(TextureRegion tr, Unit o) {
 		sb.draw(tr, o.left(), o.bottom(), o.hw(), o.hh(), o.width, o.height, 1.0f, 1.0f, o.angle);
 	}
 	
@@ -146,10 +146,37 @@ public class SubGame {
 	}
 	
 	public void setScene(String name) {
-		scene = sceneMap.get(name);
+		scene = getScene(name);
 		scene.show(this);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T extends Scene> T getScene(String name) {
+		for(Scene scene : scenes) if(scene.name().equalsIgnoreCase(name)) return (T) scene;
+		Gdx.app.log("get scene", "failed to find scene called " + name);
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Scene> T  getScene() {
+		return (T) scene;
+	}
+	
+	protected Entity getEntity(String name, Scene scene) {
+		for(Entity entity : scene.entities) if(entity.name().equalsIgnoreCase(name)) return entity;
+		Gdx.app.log("get entity", "failed to find entity called " + name);
+		return new Entity.DefaultEntity();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Entity> T getEntity(String name, String scene) {
+		return (T) getEntity(name, getScene(scene));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Entity> T getEntity(String name) {
+		return (T) getEntity(name, scene);
+	}
 	
 	private InputProcessor newIP() {
 		return new InputProcessor() {

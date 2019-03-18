@@ -4,26 +4,28 @@ import static com.algodal.phase01.rps.Constants.defAtlas;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
 import com.algodal.phase01.rps.Entity;
-import com.algodal.phase01.rps.GameObject;
-import com.algodal.phase01.rps.GameState;
+import com.algodal.phase01.rps.Unit;
+import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class HandEntity extends Entity {
+public class Hand extends Entity {
 
 	private final Animation<String> animRock, animPaper, animScissors;
 	private final Animation<String>[] anims;
-	private int index;
+	protected int index; public int getIndex() { return index; }
 	private float time;
 	
-	protected final GameObject body;
+	public final static int Rock = 0, Paper = 1, Scissors = 2;
+	
+	protected final Unit body;
 	
 	private final NormalState normalState;
 	
 	@SuppressWarnings("unchecked")
-	public HandEntity() {
+	public Hand() {
 		animRock = new Animation<String>(1.0f, "rock");
 		animPaper = new Animation<String>(1.0f, "paper");
 		animScissors = new Animation<String>(1.0f, "scissors");
@@ -35,16 +37,16 @@ public class HandEntity extends Entity {
 		index = 0;
 		time = 0;
 		
-		body = new GameObject();
+		body = new Unit();
 		body.width = worldWidth * 0.25f;
 		body.height = worldWidth * 0.25f;
 		
 		normalState = new NormalState();
 		
-		setGameState(normalState);
+		setState(normalState);
 	}
 	
-	public class NormalState extends GameState {
+	public class NormalState extends State {
 
 		@Override
 		public String name() {

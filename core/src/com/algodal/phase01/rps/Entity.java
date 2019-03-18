@@ -2,14 +2,22 @@ package com.algodal.phase01.rps;
 
 import static com.algodal.phase01.rps.Constants.defGS;
 
-public abstract class Entity extends GameState {
+public abstract class Entity extends State {
 
 	private final static String en = "com.algodal.phase01.Entity";
 	
-	private GameState state;
+	private State state;
 	
 	public Entity() {
-		setGameState(defGS);
+		setState(defGS);
+	}
+	
+	public LateInitialization getLateInitialization() {
+		return new LateInitialization() {
+			@Override
+			public void initialize(SubGame sg) {
+			}
+		};
 	}
 	
 	@Override
@@ -27,7 +35,7 @@ public abstract class Entity extends GameState {
 		state.render(sg, delta);
 	}
 	
-	public void setGameState(GameState state) {
+	public void setState(State state) {
 		this.state = state;
 	}
 	
@@ -59,5 +67,9 @@ public abstract class Entity extends GameState {
 	@Override
 	public void up(float x, float y) {
 		state.up(x, y);
+	}
+	
+	public static class DefaultEntity extends Entity {
+		//
 	}
 }

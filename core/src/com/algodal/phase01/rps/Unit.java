@@ -1,6 +1,6 @@
 package com.algodal.phase01.rps;
 
-public class GameObject {
+public class Unit {
 
 	public float x, y, width, height, angle;
 	
@@ -17,7 +17,7 @@ public class GameObject {
 	public void bottom(float bottom) { y = bottom + hh(); }
 	public void top(float top) { y = top - hh(); }
 	
-	public void copy(GameObject o) {
+	public void copy(Unit o) {
 		x = o.x;
 		y = o.y;
 		width = o.width;
@@ -27,7 +27,7 @@ public class GameObject {
 	
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		final GameObject o = new GameObject();
+		final Unit o = new Unit();
 		o.copy(this);
 		return o;
 	}

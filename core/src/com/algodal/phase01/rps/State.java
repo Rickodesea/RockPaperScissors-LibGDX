@@ -1,6 +1,6 @@
 package com.algodal.phase01.rps;
 
-public abstract class GameState implements Input {
+public abstract class State implements Input {
 
 	public String name() {
 		return "com.algodal.phase01.GameState";
@@ -45,7 +45,7 @@ public abstract class GameState implements Input {
 		
 	}
 	
-	public static class DefaultGameState extends GameState {
+	public static class DefaultGameState extends State {
 
 		@Override
 		public String name() {
