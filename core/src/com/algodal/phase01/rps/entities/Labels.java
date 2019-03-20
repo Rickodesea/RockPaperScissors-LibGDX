@@ -2,18 +2,16 @@ package com.algodal.phase01.rps.entities;
 
 import static com.algodal.phase01.rps.Constants.defSkin;
 import static com.algodal.phase01.rps.Constants.margin;
+import static com.algodal.phase01.rps.Constants.setFromBottom;
 import static com.algodal.phase01.rps.Constants.setFromLeft;
 import static com.algodal.phase01.rps.Constants.setFromRight;
 import static com.algodal.phase01.rps.Constants.setFromTop;
 
+import com.algodal.phase01.rps.ActorWrap;
 import com.algodal.phase01.rps.Entity;
 import com.algodal.phase01.rps.LateInitialization;
 import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
-import com.algodal.phase01.rps.scenes.Play;
-import com.algodal.phase01.rps.scenes.Play.Data;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.StringBuilder;
@@ -21,7 +19,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 public class Labels extends Entity {
 
 	private final NormalState normalState;
-	private ActorWrap score, round;
+	private ActorWrap score, round, message;
 	
 	private final StringBuilder stringBuilder;
 	
@@ -49,6 +47,12 @@ public class Labels extends Entity {
 				
 				setFromTop(0.15f, round, false);
 				setFromRight(margin, round, false);
+				
+				message = new ActorWrap(new Label("player 1 turn", (Skin) sg.get(defSkin)));
+				message.setScale(scale);
+				
+				setFromBottom(0.27f, message);
+				setFromLeft(0.50f, message);
 			}
 		};
 	}
@@ -59,45 +63,31 @@ public class Labels extends Entity {
 		public void show(SubGame sg) {
 			sg.st.addActor(score);
 			sg.st.addActor(round);
+			sg.st.addActor(message);
 		}
 		
 		@Override
 		public void render(SubGame sg, float delta) {
-			final Play play = sg.getScene();
-			final Data data = play.data;
-			
 			stringBuilder.clear();
 			stringBuilder.append("Score ");
-			if(data.player01.scoreAmount<10) stringBuilder.append("0");
-			stringBuilder.append(data.player01.scoreAmount);
+			if(sg.data.play.player01.scoreAmount<10) stringBuilder.append("0");
+			stringBuilder.append(sg.data.play.player01.scoreAmount);
 			stringBuilder.append(" v ");
-			if(data.player02.scoreAmount<10) stringBuilder.append("0");
-			stringBuilder.append(data.player02.scoreAmount);
+			if(sg.data.play.player02.scoreAmount<10) stringBuilder.append("0");
+			stringBuilder.append(sg.data.play.player02.scoreAmount);
 			final Label scoreLabel = (Label)score.actor;
 			scoreLabel.setText(stringBuilder);
 			
 			stringBuilder.clear();
-			if(data.setting.completedRounds<10) stringBuilder.append("0");
-			stringBuilder.append(data.setting.completedRounds);
+			if(sg.data.play.setting.completedRounds<10) stringBuilder.append("0");
+			stringBuilder.append(sg.data.play.setting.completedRounds);
 			stringBuilder.append(" / ");
-			if(data.setting.maxRounds<10) stringBuilder.append("0");
-			stringBuilder.append(data.setting.maxRounds);
+			if(sg.data.play.setting.maxRounds<10) stringBuilder.append("0");
+			stringBuilder.append(sg.data.play.setting.maxRounds);
 			stringBuilder.append(" Round");
 			final Label roundLabel = (Label)round.actor;
 			roundLabel.setText(stringBuilder);
 		}
 		
-	}
-	
-	public static class ActorWrap extends Group {
-		
-		public final Actor actor;
-		
-		public ActorWrap(Actor actor) {
-			super();
-			addActor(actor);
-			setSize(actor.getWidth(), actor.getHeight());
-			this.actor = actor;
-		}
 	}
 }

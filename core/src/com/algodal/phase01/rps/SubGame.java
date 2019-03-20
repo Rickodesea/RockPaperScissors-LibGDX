@@ -2,10 +2,13 @@ package com.algodal.phase01.rps;
 
 import static com.algodal.phase01.rps.Constants.defAtlas;
 import static com.algodal.phase01.rps.Constants.defSkin;
-import static com.algodal.phase01.rps.Constants.gplScene;
+import static com.algodal.phase01.rps.Constants.menScene;
 import static com.algodal.phase01.rps.Constants.worldHeight;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
+import com.algodal.phase01.rps.dialogs.IDialog;
+import com.algodal.phase01.rps.dialogs.QuickSettingDialog;
+import com.algodal.phase01.rps.scenes.Menu;
 import com.algodal.phase01.rps.scenes.Play;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -25,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -42,8 +46,11 @@ public class SubGame {
 	private final Array<Scene> scenes;
 	
 	private final ArrayMap<String, AssetDescriptor<?>> adMap;
+	private final ArrayMap<String, IDialog> dialogMap;
 	
 	private final InputMultiplexer im;
+	
+	public final Data data = new Data();
 	
 	public SubGame() {
 		sb = new SpriteBatch();
@@ -63,12 +70,21 @@ public class SubGame {
 		scenes = new Array<Scene>();
 		scenes.add(new DefaultScene());
 		scenes.add(new Play());
-		for(Scene scene : scenes) scene.lateInitialize(this);
+		scenes.add(new Menu());
+		scene = scenes.get(scenes.size-1); //make non-null as soon as possible
+		
+		dialogMap = new ArrayMap<String, IDialog>();
+		dialogMap.put("quicksetting", new QuickSettingDialog());
 		
 		im = new InputMultiplexer(st, newIP(), newGD());
 		Gdx.input.setInputProcessor(im);
 		
-		setScene(gplScene);
+		//Call LateInitializations
+		for(Scene scene : scenes) scene.lateInitialize(this);
+		for(Entry<String, IDialog> dialogEntry : dialogMap) dialogEntry.value.getLateInitialization().initialize(this);
+		
+		//Set scene
+		setScene(menScene);
 	}
 	
 	protected void render() {
@@ -157,9 +173,14 @@ public class SubGame {
 		return null;
 	}
 	
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public <T extends Scene> T  getScene() {
 		return (T) scene;
+	}
+	
+	public IDialog getDialog(String name) {
+		return dialogMap.get(name);
 	}
 	
 	protected Entity getEntity(String name, Scene scene) {
@@ -308,6 +329,35 @@ public class SubGame {
 		public void render(SubGame sg, float delta) {
 			// TODO Auto-generated method stub
 			
+		}
+	}
+	
+	public static class Data {
+		
+		public final Play play = new Play();
+		public final Menu menu = new Menu();
+		
+		public static class Play {
+			public final Player player01 = new Player();
+			public final Player player02 = new Player();
+			public final Setting setting = new Setting();
+			
+			public static class Setting {
+				public int maxRounds = 3;
+				public int completedRounds = 0;
+			}
+			
+			public static class Player {
+				public int scoreAmount = 0;
+			}
+		}
+		
+		public static class Menu {
+			public boolean fullVersionPurchased = false;
+			public float masterVolume = 1.0f;
+			public float soundVolume = 1.0f;
+			public float musicVolume = 1.0f;
+			public boolean newGame = true;
 		}
 	}
 }

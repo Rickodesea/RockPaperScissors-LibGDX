@@ -7,8 +7,6 @@ import static com.algodal.phase01.rps.Constants.handWidth;
 import com.algodal.phase01.rps.Entity;
 import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
-import com.algodal.phase01.rps.scenes.Play;
-import com.algodal.phase01.rps.scenes.Play.Data;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.RandomXS128;
@@ -81,16 +79,14 @@ public class HandManager extends Entity {
 	}
 	
 	public void compare(SubGame sg) {
-		final Play play = sg.getScene();
-		final Data data = play.data;
 		for(int i = 0; i < pairs.length; i++) {
 			final Pair pair = pairs[i];
 			switch(pair.compare()) {
 			case Pair.BottomWins:{
-				data.player01.scoreAmount++;
+				sg.data.play.player01.scoreAmount++;
 			}break;
 			case Pair.TopWins:{
-				data.player02.scoreAmount++;
+				sg.data.play.player02.scoreAmount++;
 			}
 			default: continue;
 			}
