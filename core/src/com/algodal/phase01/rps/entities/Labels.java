@@ -57,6 +57,28 @@ public class Labels extends Entity {
 		};
 	}
 	
+	private void update(SubGame sg) {
+		stringBuilder.clear();
+		stringBuilder.append("Score ");
+		if(sg.data.play.player01.scoreAmount<10) stringBuilder.append("0");
+		stringBuilder.append(sg.data.play.player01.scoreAmount);
+		stringBuilder.append(" v ");
+		if(sg.data.play.player02.scoreAmount<10) stringBuilder.append("0");
+		stringBuilder.append(sg.data.play.player02.scoreAmount);
+		final Label scoreLabel = (Label)score.actor;
+		scoreLabel.setText(stringBuilder);
+		
+		stringBuilder.clear();
+		if(sg.data.play.setting.completedRounds<10) stringBuilder.append("0");
+		stringBuilder.append(sg.data.play.setting.completedRounds);
+		stringBuilder.append(" / ");
+		if(sg.data.play.setting.maxRounds<10) stringBuilder.append("0");
+		stringBuilder.append(sg.data.play.setting.maxRounds);
+		stringBuilder.append(" Round");
+		final Label roundLabel = (Label)round.actor;
+		roundLabel.setText(stringBuilder);
+	}
+	
 	public class NormalState extends State {
 
 		@Override
@@ -68,25 +90,7 @@ public class Labels extends Entity {
 		
 		@Override
 		public void render(SubGame sg, float delta) {
-			stringBuilder.clear();
-			stringBuilder.append("Score ");
-			if(sg.data.play.player01.scoreAmount<10) stringBuilder.append("0");
-			stringBuilder.append(sg.data.play.player01.scoreAmount);
-			stringBuilder.append(" v ");
-			if(sg.data.play.player02.scoreAmount<10) stringBuilder.append("0");
-			stringBuilder.append(sg.data.play.player02.scoreAmount);
-			final Label scoreLabel = (Label)score.actor;
-			scoreLabel.setText(stringBuilder);
-			
-			stringBuilder.clear();
-			if(sg.data.play.setting.completedRounds<10) stringBuilder.append("0");
-			stringBuilder.append(sg.data.play.setting.completedRounds);
-			stringBuilder.append(" / ");
-			if(sg.data.play.setting.maxRounds<10) stringBuilder.append("0");
-			stringBuilder.append(sg.data.play.setting.maxRounds);
-			stringBuilder.append(" Round");
-			final Label roundLabel = (Label)round.actor;
-			roundLabel.setText(stringBuilder);
+			update(sg);
 		}
 		
 	}

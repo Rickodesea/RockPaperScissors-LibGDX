@@ -2,14 +2,20 @@ package com.algodal.phase01.rps;
 
 import static com.algodal.phase01.rps.Constants.defAtlas;
 import static com.algodal.phase01.rps.Constants.defSkin;
-import static com.algodal.phase01.rps.Constants.menScene;
+import static com.algodal.phase01.rps.Constants.skiScene;
 import static com.algodal.phase01.rps.Constants.worldHeight;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
 import com.algodal.phase01.rps.dialogs.IDialog;
 import com.algodal.phase01.rps.dialogs.QuickSettingDialog;
+import com.algodal.phase01.rps.entities.LockBG;
+import com.algodal.phase01.rps.entities.LockHand;
 import com.algodal.phase01.rps.scenes.Menu;
 import com.algodal.phase01.rps.scenes.Play;
+import com.algodal.phase01.rps.scenes.SkinSetup;
+import com.algodal.phase01.rps.ui.Gallery;
+import com.algodal.phase01.rps.utils.BackgroundSkin;
+import com.algodal.phase01.rps.utils.HandSkin;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -52,6 +58,12 @@ public class SubGame {
 	
 	public final Data data = new Data();
 	
+	//Facilitates communication between Entities
+	public final LockHand lockHand;
+	public final Gallery handGallery;
+	public final LockBG lockBG;
+	public final Gallery bgGallery;
+	
 	public SubGame() {
 		sb = new SpriteBatch();
 		vp = new FitViewport(worldWidth, worldHeight);
@@ -67,8 +79,14 @@ public class SubGame {
 		adMap.put(defAtlas, new AssetDescriptor<TextureAtlas>(defAtlas, TextureAtlas.class));
 		adMap.put(defSkin, new AssetDescriptor<Skin>(defSkin, Skin.class));
 		
+		handGallery = new Gallery(data.play.setting.handskins);
+		bgGallery = new Gallery(data.play.setting.bgskins);
+		lockHand = new LockHand();
+		lockBG = new LockBG();
+		
 		scenes = new Array<Scene>();
 		scenes.add(new DefaultScene());
+		scenes.add(new SkinSetup());
 		scenes.add(new Play());
 		scenes.add(new Menu());
 		scene = scenes.get(scenes.size-1); //make non-null as soon as possible
@@ -84,7 +102,7 @@ public class SubGame {
 		for(Entry<String, IDialog> dialogEntry : dialogMap) dialogEntry.value.getLateInitialization().initialize(this);
 		
 		//Set scene
-		setScene(menScene);
+		setScene(skiScene);
 	}
 	
 	protected void render() {
@@ -191,7 +209,8 @@ public class SubGame {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T getEntity(String name, String scene) {
-		return (T) getEntity(name, getScene(scene));
+		final Scene s = getScene(scene);
+		return (T) getEntity(name, s);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -345,6 +364,31 @@ public class SubGame {
 			public static class Setting {
 				public int maxRounds = 3;
 				public int completedRounds = 0;
+				public HandSkin[] handskins = new HandSkin[] {
+						new HandSkin("rock_0", "paper_0", "scissors_0"),
+						new HandSkin("rock_1", "paper_1", "scissors_1"),
+						new HandSkin("rock_2", "paper_2", "scissors_2"),
+						new HandSkin("rock_3", "paper_3", "scissors_3"),
+				};
+				public BackgroundSkin[] bgskins = new BackgroundSkin[] {
+						new BackgroundSkin("bg_0"),
+						new BackgroundSkin("bg_1"),
+						new BackgroundSkin("bg_2"),
+						new BackgroundSkin("bg_3"),
+						new BackgroundSkin("bg_4"),
+						new BackgroundSkin("bg_5"),
+						new BackgroundSkin("bg_6"),
+						new BackgroundSkin("bg_7"),
+				};
+				public int handSkinIndex = 0, bgSkinIndex = 0;
+				
+				public HandSkin handSkin() {
+					return handskins[handSkinIndex];
+				}
+				
+				public BackgroundSkin bgSkin() {
+					return bgskins[bgSkinIndex];
+				}
 			}
 			
 			public static class Player {
@@ -357,7 +401,8 @@ public class SubGame {
 			public float masterVolume = 1.0f;
 			public float soundVolume = 1.0f;
 			public float musicVolume = 1.0f;
-			public boolean newGame = true;
+			public boolean newGame = false;
+			public int mode = 0;
 		}
 	}
 }

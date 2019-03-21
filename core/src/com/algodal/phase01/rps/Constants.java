@@ -12,6 +12,7 @@ public class Constants {
 	public final static String defScene = "com.algodal.phase01.scenes.DefaultScene";
 	public final static String gplScene = "com.algodal.phase01.scenes.PlayScene";
 	public final static String menScene = "com.algodal.phase01.scenes.MenuScene";
+	public final static String skiScene = "com.algodal.phase01.scenes.SkinScene";
 	
 	public final static String defAtlas = "atlas/rockpaperscissors.atlas";
 	public final static String defSkin = "skin/uiskin.json";

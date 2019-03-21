@@ -32,7 +32,7 @@ public class QuickSettingDialog implements IDialog {
 				
 				slider = new Slider(3, 25, 1, false,  (Skin) sg.get(defSkin));
 				
-				dialog = new Dialog("Quick Setting", (Skin) sg.get(defSkin)) {
+				dialog = new Dialog("Setting", (Skin) sg.get(defSkin)) {
 					@Override
 					protected void result(Object object) {
 						final boolean result = (Boolean)object;
@@ -51,7 +51,6 @@ public class QuickSettingDialog implements IDialog {
 				dialog.button("  Cancel  ", false); //sends "false" as the result
 				dialog.getContentTable().row();
 				dialog.getContentTable().add(slider);
-				System.out.println(dialog.getContentTable().getCells().size);
 				
 				//Listeners
 				slider.addListener(new ChangeListener() {

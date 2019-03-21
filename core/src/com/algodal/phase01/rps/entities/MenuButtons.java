@@ -4,35 +4,43 @@ import static com.algodal.phase01.rps.Constants.defSkin;
 import static com.algodal.phase01.rps.Constants.gplScene;
 import static com.algodal.phase01.rps.Constants.setFromBottom;
 import static com.algodal.phase01.rps.Constants.setFromLeft;
+import static com.algodal.phase01.rps.Constants.skiScene;
+import static com.algodal.phase01.rps.Constants.worldWidth;
 
 import com.algodal.phase01.rps.ActorWrap;
 import com.algodal.phase01.rps.Entity;
 import com.algodal.phase01.rps.LateInitialization;
 import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
+import com.algodal.phase01.rps.dialogs.AdsDialog;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 public class MenuButtons extends Entity {
 
 	public final NormalState normalState;
 	
-	private TextButton newGameBtn, contGameBtn, remAdsBtn;
+	private TextButton newGameBtn, contGameBtn, remAdsBtn, qSetBtn, skinBtn;
 	private ActorWrap sliMaster, sliSound, sliMusic;
 	private ActorWrap master, sfx, bgm;
+	private ActorWrap mode;
+	private AdsDialog adsDialog;
 	
 	private final static float scale = 1.0f / 3.5f;
 	
 	public MenuButtons() {
 		normalState = new NormalState();
 		setState(normalState);
+		adsDialog = new AdsDialog();
 	}
 	
 	@Override
@@ -46,9 +54,13 @@ public class MenuButtons extends Entity {
 			
 			@Override
 			public void initialize(final SubGame sg) {
+				adsDialog.getLateInitialization().initialize(sg);
+				
 				newGameBtn = new TextButton("New Game", (Skin) sg.get(defSkin)); newGameBtn.setTransform(true);
 				contGameBtn = new TextButton("Continue Game", (Skin) sg.get(defSkin)); contGameBtn.setTransform(true);
 				remAdsBtn = new TextButton("Remove Ads + Unlock Skins", (Skin) sg.get(defSkin)); remAdsBtn.setTransform(true);
+				qSetBtn = new TextButton("Setting", (Skin) sg.get(defSkin)); qSetBtn.setTransform(true);
+				skinBtn = new TextButton("Skin", (Skin) sg.get(defSkin)); skinBtn.setTransform(true);
 				
 				sliMaster = new ActorWrap(new Slider(0, 1, 0.1f, false, (Skin) sg.get(defSkin)));
 				sliSound  = new ActorWrap(new Slider(0, 1, 0.1f, false, (Skin) sg.get(defSkin)));
@@ -61,6 +73,8 @@ public class MenuButtons extends Entity {
 				newGameBtn.setScale(scale);
 				contGameBtn.setScale(scale);
 				remAdsBtn.setScale(scale);
+				qSetBtn.setScale(scale);
+				skinBtn.setScale(scale);
 				
 				sliMaster.setScale(scale);
 				sliMusic.setScale(scale);
@@ -73,6 +87,8 @@ public class MenuButtons extends Entity {
 				setFromLeft(0.5f, newGameBtn);
 				setFromLeft(0.5f, contGameBtn);
 				setFromLeft(0.5f, remAdsBtn);
+				setFromLeft(0.5f, qSetBtn);
+				setFromLeft(0.5f, skinBtn);
 				
 				setFromLeft(0.5f, master);
 				setFromLeft(0.5f, sliMaster);
@@ -82,17 +98,21 @@ public class MenuButtons extends Entity {
 				setFromLeft(0.5f, sliSound);
 				
 				final float push =-0.05f;
+				final float btnoff = +0.08f;
 				
-				setFromBottom(0.800f+push, contGameBtn);
-				setFromBottom(0.725f+push, newGameBtn);
-				setFromBottom(0.65f+push, remAdsBtn);
+				setFromBottom(0.800f+push+btnoff, contGameBtn);
+				setFromBottom(0.725f+push+btnoff, newGameBtn);
+				setFromBottom(0.65f+push+btnoff, remAdsBtn);
 				
-				setFromBottom(0.503f+push, master);
-				setFromBottom(0.47f+push, sliMaster);
-				setFromBottom(0.393f+push, bgm);
-				setFromBottom(0.36f+push, sliMusic);
-				setFromBottom(0.283f+push, sfx);
-				setFromBottom(0.25f+push, sliSound);
+				setFromBottom(0.600f, qSetBtn);
+				setFromBottom(0.525f, skinBtn);
+				
+				setFromBottom(0.403f+push, master);
+				setFromBottom(0.37f+push, sliMaster);
+				setFromBottom(0.293f+push, bgm);
+				setFromBottom(0.26f+push, sliMusic);
+				setFromBottom(0.183f+push, sfx);
+				setFromBottom(0.15f+push, sliSound);
 				
 				((Slider)sliMaster.actor).setValue(sg.data.menu.masterVolume);
 				((Slider)sliSound.actor).setValue(sg.data.menu.soundVolume);
@@ -137,6 +157,46 @@ public class MenuButtons extends Entity {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
 						Gdx.app.log("Remove Ads", "Button Selected");
+						adsDialog.show(sg);
+					}
+				});
+				
+				qSetBtn.addListener(new ClickListener() {
+					@Override
+					public void clicked(InputEvent event, float x, float y) {
+						sg.getDialog("quicksetting").show(sg);
+					}
+				});
+				
+				skinBtn.addListener(new ClickListener() {
+					@Override
+					public void clicked(InputEvent event, float x, float y) {
+						sg.setScene(skiScene);
+					}
+				});
+				
+				//MODE
+				mode = new ActorWrap(new SelectBox<String>((Skin) sg.get(defSkin)));
+				final String[] items = new String[] {
+						"SINGLE PLAYER", "LOCAL MULTIPLAYER", "ONLINE MULTIPLAYER"
+				};
+				@SuppressWarnings("unchecked")
+				final SelectBox<String> modeBox = (SelectBox<String>) mode.actor;
+				modeBox.setItems(items);
+				modeBox.setAlignment(Align.center);
+				mode.setScale(scale);
+				modeBox.pack();
+				modeBox.setSelectedIndex(0);
+				mode.setWidth(worldWidth*0.80f/scale);
+				setFromLeft(0.50f, mode, true);
+				setFromBottom(0.430f, mode);
+				mode.centerActor();
+				modeBox.clearListeners();
+				modeBox.addListener(new ClickListener() {
+					@Override
+					public void clicked(InputEvent event, float x, float y) {
+						sg.data.menu.mode = (modeBox.getSelectedIndex()==items.length-1)?0:modeBox.getSelectedIndex()+1;
+						modeBox.setSelectedIndex(sg.data.menu.mode);
 					}
 				});
 			}
@@ -164,6 +224,9 @@ public class MenuButtons extends Entity {
 			sg.st.addActor(master);
 			sg.st.addActor(bgm);
 			sg.st.addActor(sfx);
+			sg.st.addActor(qSetBtn);
+			sg.st.addActor(skinBtn);
+			sg.st.addActor(mode);
 		}
 		
 		@Override

@@ -4,6 +4,7 @@ import static com.algodal.phase01.rps.Constants.gplScene;
 
 import com.algodal.phase01.rps.Scene;
 import com.algodal.phase01.rps.SubGame;
+import com.algodal.phase01.rps.entities.Background;
 import com.algodal.phase01.rps.entities.Buttons;
 import com.algodal.phase01.rps.entities.HandManager;
 import com.algodal.phase01.rps.entities.Labels;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 public class Play extends Scene {
 
 	public Play() {
+		entities.add(new Background());
 		entities.add(new HandManager());
 		entities.add(new Buttons());
 		entities.add(new Labels());

@@ -90,7 +90,7 @@ public class Buttons extends Entity {
 					}
 				});
 				
-				qsetbtn = new TextButton("Quick Setting", (Skin) sg.get(defSkin));
+				qsetbtn = new TextButton("Setting", (Skin) sg.get(defSkin));
 				qsetbtn.setTransform(true);
 				qsetbtn.setScale(scale);
 				setFromBottom(0.025f, qsetbtn, false);

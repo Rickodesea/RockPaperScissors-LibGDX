@@ -14,6 +14,14 @@ public class ActorWrap extends Group {
 		this.actor = actor;
 	}
 	
+	public void centerActor() {
+		actor.setPosition(getWidth() / 2 - actor.getWidth() / 2, getHeight() / 2 - actor.getHeight() / 2);
+	}
+	
+	public void fitActor() {
+		actor.setSize(getWidth(), getHeight());
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T> T actor(Class<T> clazz) {
 		return (T)actor;
