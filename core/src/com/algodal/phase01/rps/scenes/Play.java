@@ -11,8 +11,6 @@ import com.algodal.phase01.rps.entities.Labels;
 import com.algodal.phase01.rps.entities.Title;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 public class Play extends Scene {
 
@@ -58,6 +56,7 @@ public class Play extends Scene {
 			if(sg.data.play.setting.maxRounds < 3) sg.data.play.setting.maxRounds = 3;
 		}
 		
+		/**   //Don't need to do this because we now have the EndGameDialog.
 		if(sg.data.play.setting.completedRounds >= sg.data.play.setting.maxRounds) {
 			for(Actor actor : sg.st.getActors()) if(actor.getTouchable() != Touchable.disabled) {
 				actor.setTouchable(Touchable.disabled);
@@ -70,6 +69,6 @@ public class Play extends Scene {
 			for(Actor actor : sg.st.getActors()) if(actor.getTouchable() != Touchable.enabled) {
 				actor.setTouchable(Touchable.enabled);
 			}
-		}
+		}*/
 	}
 }

@@ -13,6 +13,7 @@ import com.algodal.phase01.rps.LateInitialization;
 import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
 import com.algodal.phase01.rps.dialogs.AdsDialog;
+import com.algodal.phase01.rps.helper.PlayHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -142,6 +143,14 @@ public class MenuButtons extends Entity {
 				newGameBtn.addListener(new ClickListener() {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
+						switch(sg.data.menu.mode) {
+						default:{
+							sg.playHelper.single.location = PlayHelper.Single.Step.Player01_Get_Ready;
+						}break;
+						case 1:{
+							sg.playHelper.local.location = PlayHelper.Local.Step.Game_Intro;
+						}break;
+						}
 						sg.setScene(gplScene);
 					}
 				});
@@ -195,12 +204,18 @@ public class MenuButtons extends Entity {
 				modeBox.addListener(new ClickListener() {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
-						sg.data.menu.mode = (modeBox.getSelectedIndex()==items.length-1)?0:modeBox.getSelectedIndex()+1;
+						sg.data.menu.mode++;
+						if(sg.data.menu.mode>2) sg.data.menu.mode=0;
 						modeBox.setSelectedIndex(sg.data.menu.mode);
 						switch(sg.data.menu.mode) {
 						default: {
 							sg.play.handManager.setState(sg.play.handManager.singlePlayerState);
-						}
+							sg.play.buttons.setState(sg.play.buttons.singlePlayerState);
+						}break;
+						case 1:{
+							sg.play.handManager.setState(sg.play.handManager.localMultiPlayerState);
+							sg.play.buttons.setState(sg.play.buttons.localMultiPlayerState);
+						}break;
 						}
 					}
 				});
@@ -240,6 +255,17 @@ public class MenuButtons extends Entity {
 			sg.applyStageViewport();
 			sg.st.act();
 			sg.st.draw();
+			
+			switch(sg.data.menu.mode) {
+			default: {
+				sg.play.handManager.setState(sg.play.handManager.singlePlayerState);
+				sg.play.buttons.setState(sg.play.buttons.singlePlayerState);
+			}break;
+			case 1:{
+				sg.play.handManager.setState(sg.play.handManager.localMultiPlayerState);
+				sg.play.buttons.setState(sg.play.buttons.localMultiPlayerState);
+			}break;
+			}
 		}
 	}
 }

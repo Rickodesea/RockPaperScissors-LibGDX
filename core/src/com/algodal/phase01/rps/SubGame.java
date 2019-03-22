@@ -6,6 +6,7 @@ import static com.algodal.phase01.rps.Constants.menScene;
 import static com.algodal.phase01.rps.Constants.worldHeight;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
+import com.algodal.phase01.rps.dialogs.ForceQuitDialog;
 import com.algodal.phase01.rps.dialogs.IDialog;
 import com.algodal.phase01.rps.dialogs.QuickSettingDialog;
 import com.algodal.phase01.rps.entities.LockBG;
@@ -68,6 +69,7 @@ public class SubGame {
 	
 	private final Preferences prefs;
 	
+	@Deprecated
 	public boolean player01Turn = true;
 	public final PlayHelper playHelper = new PlayHelper();
 	public final Play play = new Play(); //Allow easy communication between objects.
@@ -104,6 +106,7 @@ public class SubGame {
 		
 		dialogMap = new ArrayMap<String, IDialog>();
 		dialogMap.put("quicksetting", new QuickSettingDialog());
+		dialogMap.put("forcequit", new ForceQuitDialog());
 		
 		im = new InputMultiplexer(st, newIP(), newGD());
 		Gdx.input.setInputProcessor(im);
@@ -114,6 +117,27 @@ public class SubGame {
 		
 		//Set scene
 		setScene(menScene);
+	}
+	
+	public boolean hasStartedPlaying() {
+		if(data.play.setting.completedRounds > 0) return true;
+		switch(data.menu.mode) {
+		default: return playHelper.single.location != PlayHelper.Single.Step.Player01_Get_Ready;
+		case 1: return playHelper.local.location != PlayHelper.Local.Step.Game_Intro;
+		}
+	}
+	
+	public void reset() {
+		data.play.setting.completedRounds = 0;
+		data.play.player01.scoreAmount = 0;
+		data.play.player02.scoreAmount = 0;
+		play.handManager.reset();
+	}
+	
+	public void resetWithoutIndex() {
+		data.play.setting.completedRounds = 0;
+		data.play.player01.scoreAmount = 0;
+		data.play.player02.scoreAmount = 0;
 	}
 	
 	/** updates the game data to the reference fields**/
@@ -229,6 +253,11 @@ public class SubGame {
 	
 	public IDialog getDialog(String name) {
 		return dialogMap.get(name);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends IDialog> T dialog(String name) {
+		return (T)getDialog(name);
 	}
 	
 	protected Entity getEntity(String name, Scene scene) {
