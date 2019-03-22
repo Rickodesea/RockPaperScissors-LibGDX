@@ -56,7 +56,7 @@ public class MenuButtons extends Entity {
 			public void initialize(final SubGame sg) {
 				adsDialog.getLateInitialization().initialize(sg);
 				
-				newGameBtn = new TextButton("New Game", (Skin) sg.get(defSkin)); newGameBtn.setTransform(true);
+				newGameBtn = new TextButton("  Start  ", (Skin) sg.get(defSkin)); newGameBtn.setTransform(true);
 				contGameBtn = new TextButton("Continue Game", (Skin) sg.get(defSkin)); contGameBtn.setTransform(true);
 				remAdsBtn = new TextButton("Remove Ads + Unlock Skins", (Skin) sg.get(defSkin)); remAdsBtn.setTransform(true);
 				qSetBtn = new TextButton("Setting", (Skin) sg.get(defSkin)); qSetBtn.setTransform(true);
@@ -186,7 +186,7 @@ public class MenuButtons extends Entity {
 				modeBox.setAlignment(Align.center);
 				mode.setScale(scale);
 				modeBox.pack();
-				modeBox.setSelectedIndex(0);
+				modeBox.setSelectedIndex(sg.data.menu.mode);
 				mode.setWidth(worldWidth*0.80f/scale);
 				setFromLeft(0.50f, mode, true);
 				setFromBottom(0.430f, mode);
@@ -197,12 +197,18 @@ public class MenuButtons extends Entity {
 					public void clicked(InputEvent event, float x, float y) {
 						sg.data.menu.mode = (modeBox.getSelectedIndex()==items.length-1)?0:modeBox.getSelectedIndex()+1;
 						modeBox.setSelectedIndex(sg.data.menu.mode);
+						switch(sg.data.menu.mode) {
+						default: {
+							sg.play.handManager.setState(sg.play.handManager.singlePlayerState);
+						}
+						}
 					}
 				});
 			}
 		};
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean newGame(SubGame sg) {
 		return sg.data.menu.newGame;
 	}
@@ -215,7 +221,7 @@ public class MenuButtons extends Entity {
 
 		@Override
 		public void show(SubGame sg) {
-			if(!newGame(sg))sg.st.addActor(contGameBtn);
+			//if(!newGame(sg))sg.st.addActor(contGameBtn);
 			sg.st.addActor(newGameBtn);
 			if(ads(sg))sg.st.addActor(remAdsBtn);
 			sg.st.addActor(sliMaster);

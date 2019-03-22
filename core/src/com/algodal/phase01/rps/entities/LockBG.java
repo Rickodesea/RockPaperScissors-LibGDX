@@ -45,7 +45,7 @@ protected final Unit body;
 		@Override
 		public void render(SubGame sg, float delta) {
 			final TextureAtlas atlas = sg.get(defAtlas);
-			final TextureRegion tr = atlas.findRegion("lock_1");
+			final TextureRegion tr = atlas.findRegion("lock_0");
 			
 			if(!sg.data.menu.fullVersionPurchased) {
 				if(index > 1) {

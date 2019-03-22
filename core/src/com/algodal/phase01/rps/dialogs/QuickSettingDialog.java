@@ -38,6 +38,7 @@ public class QuickSettingDialog implements IDialog {
 						final boolean result = (Boolean)object;
 						if(result) {
 							sg.data.play.setting.maxRounds = (int)slider.getValue();
+							sg.dataSave();
 						}
 					}
 				};

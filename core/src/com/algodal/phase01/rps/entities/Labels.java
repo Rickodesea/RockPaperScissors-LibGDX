@@ -2,7 +2,6 @@ package com.algodal.phase01.rps.entities;
 
 import static com.algodal.phase01.rps.Constants.defSkin;
 import static com.algodal.phase01.rps.Constants.margin;
-import static com.algodal.phase01.rps.Constants.setFromBottom;
 import static com.algodal.phase01.rps.Constants.setFromLeft;
 import static com.algodal.phase01.rps.Constants.setFromRight;
 import static com.algodal.phase01.rps.Constants.setFromTop;
@@ -19,7 +18,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 public class Labels extends Entity {
 
 	private final NormalState normalState;
-	private ActorWrap score, round, message;
+	private ActorWrap score, round;
 	
 	private final StringBuilder stringBuilder;
 	
@@ -47,12 +46,6 @@ public class Labels extends Entity {
 				
 				setFromTop(0.15f, round, false);
 				setFromRight(margin, round, false);
-				
-				message = new ActorWrap(new Label("player 1 turn", (Skin) sg.get(defSkin)));
-				message.setScale(scale);
-				
-				setFromBottom(0.27f, message);
-				setFromLeft(0.50f, message);
 			}
 		};
 	}
@@ -85,7 +78,6 @@ public class Labels extends Entity {
 		public void show(SubGame sg) {
 			sg.st.addActor(score);
 			sg.st.addActor(round);
-			sg.st.addActor(message);
 		}
 		
 		@Override

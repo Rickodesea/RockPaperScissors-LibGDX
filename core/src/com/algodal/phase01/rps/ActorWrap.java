@@ -22,6 +22,10 @@ public class ActorWrap extends Group {
 		actor.setSize(getWidth(), getHeight());
 	}
 	
+	public void fitWrap() {
+		setSize(actor.getWidth(), actor.getHeight());
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T> T actor(Class<T> clazz) {
 		return (T)actor;

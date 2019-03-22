@@ -2,7 +2,7 @@ package com.algodal.phase01.rps;
 
 import static com.algodal.phase01.rps.Constants.defAtlas;
 import static com.algodal.phase01.rps.Constants.defSkin;
-import static com.algodal.phase01.rps.Constants.skiScene;
+import static com.algodal.phase01.rps.Constants.menScene;
 import static com.algodal.phase01.rps.Constants.worldHeight;
 import static com.algodal.phase01.rps.Constants.worldWidth;
 
@@ -10,6 +10,7 @@ import com.algodal.phase01.rps.dialogs.IDialog;
 import com.algodal.phase01.rps.dialogs.QuickSettingDialog;
 import com.algodal.phase01.rps.entities.LockBG;
 import com.algodal.phase01.rps.entities.LockHand;
+import com.algodal.phase01.rps.helper.PlayHelper;
 import com.algodal.phase01.rps.scenes.Menu;
 import com.algodal.phase01.rps.scenes.Play;
 import com.algodal.phase01.rps.scenes.SkinSetup;
@@ -19,6 +20,7 @@ import com.algodal.phase01.rps.utils.HandSkin;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -64,7 +66,16 @@ public class SubGame {
 	public final LockBG lockBG;
 	public final Gallery bgGallery;
 	
+	private final Preferences prefs;
+	
+	public boolean player01Turn = true;
+	public final PlayHelper playHelper = new PlayHelper();
+	public final Play play = new Play(); //Allow easy communication between objects.
+	
 	public SubGame() {
+		prefs = Gdx.app.getPreferences("com.algodal.phase01.rps");
+		dataLoad();
+		
 		sb = new SpriteBatch();
 		vp = new FitViewport(worldWidth, worldHeight);
 		am = new AssetManager();
@@ -87,7 +98,7 @@ public class SubGame {
 		scenes = new Array<Scene>();
 		scenes.add(new DefaultScene());
 		scenes.add(new SkinSetup());
-		scenes.add(new Play());
+		scenes.add(play);
 		scenes.add(new Menu());
 		scene = scenes.get(scenes.size-1); //make non-null as soon as possible
 		
@@ -102,7 +113,22 @@ public class SubGame {
 		for(Entry<String, IDialog> dialogEntry : dialogMap) dialogEntry.value.getLateInitialization().initialize(this);
 		
 		//Set scene
-		setScene(skiScene);
+		setScene(menScene);
+	}
+	
+	/** updates the game data to the reference fields**/
+	public void dataUpdate() {
+		data.updateData(prefs);
+	}
+	
+	/** calls dataUpdate() then writes the game data to the files**/
+	public void dataSave() {
+		data.saveData(prefs);
+	}
+	
+	/** loads the data from file into the fields **/
+	public void dataLoad() {
+		data.loadData(prefs);
 	}
 	
 	protected void render() {
@@ -123,6 +149,10 @@ public class SubGame {
 		sb.dispose();
 		am.dispose();
 		st.dispose();
+	}
+	
+	protected void pause() {
+		dataSave();
 	}
 	
 	public void applySpriteViewport() {
@@ -356,6 +386,40 @@ public class SubGame {
 		public final Play play = new Play();
 		public final Menu menu = new Menu();
 		
+		private final static String play_setting_maxrnds = "Play Setting Maximum Rounds";
+		private final static String play_setting_hskini = "Play Setting Hand Skin Index";
+		private final static String play_setting_bskini = "Play Setting Background Skin Index";
+		private final static String menu_fullgame = "Menu Full Game Purchased";
+		private final static String menu_master = "Menu Master Volume";
+		private final static String menu_music = "Menu Music Volume";
+		private final static String menu_sound = "Menu Sound Volume";
+		private final static String menu_mode = "Menu Game Mode";
+		
+		protected void updateData(Preferences prefs) {
+			prefs.putInteger(play_setting_maxrnds, play.setting.maxRounds);
+			prefs.putInteger(play_setting_hskini, play.setting.handSkinIndex);
+			prefs.putInteger(play_setting_bskini, play.setting.bgSkinIndex);
+			prefs.putBoolean(menu_fullgame, menu.fullVersionPurchased);
+			prefs.putFloat(menu_master, menu.masterVolume);
+			prefs.putFloat(menu_music, menu.musicVolume);
+			prefs.putFloat(menu_sound, menu.soundVolume);
+			prefs.putInteger(menu_mode, menu.mode);
+		}
+		protected void saveData(Preferences prefs) {
+			updateData(prefs);
+			prefs.flush();
+		}
+		protected void loadData(Preferences prefs) {
+			play.setting.maxRounds = prefs.getInteger(play_setting_maxrnds, 3);
+			play.setting.handSkinIndex = prefs.getInteger(play_setting_hskini, 0);
+			play.setting.bgSkinIndex = prefs.getInteger(play_setting_bskini, 0);
+			menu.fullVersionPurchased = prefs.getBoolean(menu_fullgame, false);
+			menu.masterVolume = prefs.getFloat(menu_master, 1f);
+			menu.musicVolume = prefs.getFloat(menu_music, 1f);
+			menu.soundVolume = prefs.getFloat(menu_sound, 1f);
+			menu.mode = prefs.getInteger(menu_mode, 0);
+		}
+		
 		public static class Play {
 			public final Player player01 = new Player();
 			public final Player player02 = new Player();
@@ -367,8 +431,9 @@ public class SubGame {
 				public HandSkin[] handskins = new HandSkin[] {
 						new HandSkin("rock_0", "paper_0", "scissors_0"),
 						new HandSkin("rock_1", "paper_1", "scissors_1"),
-						new HandSkin("rock_2", "paper_2", "scissors_2"),
+						new HandSkin("rock_b", "paper_b", "scissors_b"),
 						new HandSkin("rock_3", "paper_3", "scissors_3"),
+						new HandSkin("rock_4", "paper_4", "scissors_4"),
 				};
 				public BackgroundSkin[] bgskins = new BackgroundSkin[] {
 						new BackgroundSkin("bg_0"),

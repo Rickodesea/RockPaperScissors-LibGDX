@@ -44,6 +44,9 @@ public class SkinUI extends Entity {
 				handGallery = sg.handGallery;//new Gallery(sg.data.play.setting.handskins);
 				bgGallery = sg.bgGallery;//new Gallery(sg.data.play.setting.bgskins);
 				
+				handGallery.skinIndex = sg.data.play.setting.handSkinIndex;
+				bgGallery.skinIndex = sg.data.play.setting.bgSkinIndex;
+				
 				handGallery.setUp(sg, scale, 10, 0, worldHeight / 7);
 				bgGallery.setUp(sg, scale, 10, 0, -worldHeight / 7);
 				
@@ -71,6 +74,7 @@ public class SkinUI extends Entity {
 						if(saveOK(sg)) {
 							sg.data.play.setting.bgSkinIndex = bgGallery.skinIndex;
 							sg.data.play.setting.handSkinIndex = handGallery.skinIndex;
+							sg.dataSave();
 						} else {
 							adsDialog.show(sg);
 						}

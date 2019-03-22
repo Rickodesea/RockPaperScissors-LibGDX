@@ -19,18 +19,18 @@ public class Hand extends Entity {
 	
 	protected final Unit body;
 	
-	private final NormalState normalState;
+	public final NormalState normalState = new NormalState();
+	public final CoveredState coveredState = new CoveredState();
+	public final UnCoveredState unCoveredState = new UnCoveredState();
 	
 	public Hand() {
+		setState(normalState);
+
 		index = 0;
 		
 		body = new Unit();
 		body.width = worldWidth * 0.25f;
 		body.height = worldWidth * 0.25f;
-		
-		normalState = new NormalState();
-		
-		setState(normalState);
 	}
 	
 	public class NormalState extends State {
@@ -60,5 +60,35 @@ public class Hand extends Entity {
 				index = (index > 1) ? 0 : index+1;
 			} 
 		}
+	}
+	
+	public class CoveredState extends State {
+
+		@Override
+		public void render(SubGame sg, float delta) {
+			final TextureAtlas atlas = sg.get(defAtlas);
+			final TextureRegion tr = atlas.findRegion("cover");
+			
+			sg.begin(null, null);
+			sg.draw(tr, body);
+			sg.end();
+		}
+		
+	}
+	
+	public class UnCoveredState extends State {
+
+		@Override
+		public void render(SubGame sg, float delta) {
+			final TextureAtlas atlas = sg.get(defAtlas);
+			final HandSkin handSkin = sg.data.play.setting.handSkin();
+			handSkin.type = index;
+			final TextureRegion tr = atlas.findRegion(handSkin.getRegion());
+			
+			sg.begin(null, null);
+			sg.draw(tr, body);
+			sg.end();
+		}
+		
 	}
 }

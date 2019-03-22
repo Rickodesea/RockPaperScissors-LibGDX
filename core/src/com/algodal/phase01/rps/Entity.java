@@ -39,6 +39,10 @@ public abstract class Entity extends State {
 		this.state = state;
 	}
 	
+	public State getState() {
+		return state;
+	}
+	
 	@Override
 	public void down(float x, float y) {
 		state.down(x, y);

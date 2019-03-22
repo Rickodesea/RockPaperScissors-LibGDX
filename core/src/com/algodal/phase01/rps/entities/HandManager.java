@@ -17,10 +17,13 @@ public class HandManager extends Entity {
 	private final Hand[] hands;
 	public final Pair[] pairs;
 	
-	private final NormalState normalState;
-	private final RandomXS128 random = new RandomXS128(TimeUtils.nanoTime());
+	public final NormalState normalState = new NormalState();
+	public final SinglePlayerState singlePlayerState = new SinglePlayerState();
+	public final RandomXS128 random = new RandomXS128(TimeUtils.nanoTime());
 	
 	public HandManager() {
+		setState(singlePlayerState);
+		
 		hands = new Hand[] {
 			new Hand(),
 			new Hand(),
@@ -49,16 +52,28 @@ public class HandManager extends Entity {
 				hand.body.angle = 180.0f;
 			}
 		}
-		
-		normalState = new NormalState();
-		
-		setState(normalState);
-		
-		//randomize();//TODO remove
 	}
 	
 	public void randomize() {
 		for(Hand hand : hands) hand.index = random.nextInt(3);
+	}
+	
+	public void randomizeRequiredOnly(SubGame sg) {
+		if(getState().equals(singlePlayerState)) {
+			for(int i = 0; i < hands.length; i++) {
+				final Hand hand = hands[i];
+				
+				if(sg.player01Turn) {
+					if(i > 2 && i < 6) {
+						hand.index = random.nextInt(3);
+					}
+				} else {
+					if(i > -1 && i < 3) {
+						hand.index = random.nextInt(3);
+					}
+				}
+			}
+		}
 	}
 	
 	public void reset() {
@@ -75,6 +90,31 @@ public class HandManager extends Entity {
 		for(int i = 0; i < pairs.length; i++) {
 			final Pair pair = pairs[i];
 			System.out.println(i+") "+pair.toString());
+		}
+	}
+	
+	public String getRoundVictoryMsg(int mode) {
+		int player01 = 0, player02 = 0;
+		for(int i = 0; i < pairs.length; i++) {
+			final Pair pair = pairs[i];
+			switch(pair.compare()) {
+			case Pair.BottomWins:{
+				player01 ++;
+			}break;
+			case Pair.TopWins:{
+				player02 ++;
+			}
+			default: continue;
+			}
+		}
+		
+		switch(mode) {
+		default: {
+			if(player01>player02) return "You Win this Round! Scored " + player01 + " points.";
+			if(player01<player02) return "You Lose this Round. Scored " + player01 + " points.";
+			return "This Round ends in a Draw. Scored " + player01 + " points.";
+			
+		}
 		}
 	}
 	
@@ -109,6 +149,56 @@ public class HandManager extends Entity {
 		public void down(float x, float y) {
 			for(Hand hand : hands) hand.down(x, y);
 		}
+	}
+	
+	public class SinglePlayerState extends State {
+
+		@Override
+		public void render(SubGame sg, float delta) {
+			sg.applySpriteViewport();
+			
+			for(int i = 0; i < hands.length; i++) {
+				final Hand hand = hands[i];
+				
+				switch(sg.playHelper.single.location) {
+				case Player01_Get_Ready : {
+					hand.setState(hand.unCoveredState);
+				}break;
+				case Player01_Playing: {
+					if(i > 2 && i < 6) {
+						hand.setState(hand.coveredState);
+					} else {
+						hand.setState(hand.normalState);
+					}
+				}break;
+				case Game_Reaveal : {
+					hand.setState(hand.unCoveredState);
+				}break;
+				}
+				
+				/*if(sg.player01Turn) {
+					if(i > 2 && i < 6) {
+						hand.setState(hand.coveredState);
+					} else {
+						hand.setState(hand.normalState);
+					}
+				} else {
+					if(i > -1 && i < 3) {
+						hand.setState(hand.coveredState);
+					} else {
+						hand.setState(hand.normalState);
+					}
+				}*/
+				
+				hand.render(sg, delta);
+			}
+		}
+		
+		@Override
+		public void down(float x, float y) {
+			for(Hand hand : hands) hand.down(x, y);
+		}
+		
 	}
 	
 	public static class Pair {

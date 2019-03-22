@@ -16,10 +16,14 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 public class Play extends Scene {
 
+	//Allow easy communication between objects.
+	public final HandManager handManager = new HandManager();
+	public final Buttons buttons = new Buttons();
+	
 	public Play() {
 		entities.add(new Background());
-		entities.add(new HandManager());
-		entities.add(new Buttons());
+		entities.add(handManager);
+		entities.add(buttons);
 		entities.add(new Labels());
 		entities.add(new Title());
 	}
