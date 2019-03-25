@@ -55,6 +55,7 @@ public class Gallery extends UI {
 				skinIndex--;
 				if(skinIndex < 0) skinIndex = displaySkins.length - 1;
 				updateImage(sg);
+				sg.playTone();
 			}
 		});
 		
@@ -64,6 +65,7 @@ public class Gallery extends UI {
 				skinIndex++;
 				if(skinIndex >= displaySkins.length) skinIndex = 0;
 				updateImage(sg);
+				sg.playTone();
 			}
 		});
 	}

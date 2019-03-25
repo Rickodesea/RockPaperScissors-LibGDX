@@ -30,6 +30,7 @@ public class ForceQuitDialog implements IDialog {
 						final boolean result = (Boolean)object;
 						
 						if(result && runnable!=null) runnable.run();
+						sg.playTone();
 					}
 				};
 				

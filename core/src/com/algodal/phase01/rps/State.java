@@ -8,6 +8,8 @@ public abstract class State implements Input {
 	
 	public void show(SubGame sg) {}
 	
+	public void onSet() {}
+	
 	public abstract void render(SubGame sg, float delta);
 	
 	@Override

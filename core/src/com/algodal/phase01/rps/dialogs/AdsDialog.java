@@ -28,6 +28,7 @@ public class AdsDialog implements IDialog {
 					protected void result(Object object) {
 						final boolean result = (Boolean)object;
 						Gdx.app.log("Ads Dialog", Boolean.toString(result));
+						sg.playTone();
 					}
 				};
 				

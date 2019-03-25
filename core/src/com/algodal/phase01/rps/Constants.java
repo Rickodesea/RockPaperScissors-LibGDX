@@ -15,7 +15,15 @@ public class Constants {
 	public final static String skiScene = "com.algodal.phase01.scenes.SkinScene";
 	
 	public final static String defAtlas = "atlas/rockpaperscissors.atlas";
-	public final static String defSkin = "skin/uiskin.json";
+	public final static String defSkin = "skin/shade/uiskin.json";
+	
+	public final static String sndClick = "audio/click.ogg";
+	public final static String sndTone = "audio/tone.ogg";
+	public final static String sndJingle = "audio/jingle.ogg";
+	public final static String sndDoor = "audio/door.ogg";
+	public final static String musEmerald = "audio/emerald.mp3";
+	public final static String musMenu = "audio/menu.mp3";
+	
 	
 	public final static DefaultGameState defGS = new DefaultGameState();
 	

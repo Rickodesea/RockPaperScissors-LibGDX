@@ -123,6 +123,8 @@ public class MenuButtons extends Entity {
 					@Override
 					public void changed(ChangeEvent event, Actor actor) {
 						sg.data.menu.masterVolume = sliMaster.actor(Slider.class).getValue();
+						sg.musEmerald.setVolume(sg.data.menu.masterVolume*sg.data.menu.musicVolume);
+						sg.musMenu.setVolume(sg.data.menu.masterVolume*sg.data.menu.musicVolume);
 					}
 				});
 				
@@ -130,6 +132,8 @@ public class MenuButtons extends Entity {
 					@Override
 					public void changed(ChangeEvent event, Actor actor) {
 						sg.data.menu.musicVolume = sliMusic.actor(Slider.class).getValue();
+						sg.musEmerald.setVolume(sg.data.menu.masterVolume*sg.data.menu.musicVolume);
+						sg.musMenu.setVolume(sg.data.menu.masterVolume*sg.data.menu.musicVolume);
 					}
 				});
 				
@@ -152,6 +156,7 @@ public class MenuButtons extends Entity {
 						}break;
 						}
 						sg.setScene(gplScene);
+						sg.playTone();
 					}
 				});
 				
@@ -159,6 +164,7 @@ public class MenuButtons extends Entity {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
 						sg.setScene(gplScene);
+						sg.playTone();
 					}
 				});
 				
@@ -167,6 +173,7 @@ public class MenuButtons extends Entity {
 					public void clicked(InputEvent event, float x, float y) {
 						Gdx.app.log("Remove Ads", "Button Selected");
 						adsDialog.show(sg);
+						sg.playTone();
 					}
 				});
 				
@@ -174,13 +181,19 @@ public class MenuButtons extends Entity {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
 						sg.getDialog("quicksetting").show(sg);
+						sg.playTone();
 					}
 				});
 				
 				skinBtn.addListener(new ClickListener() {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
+						sg.handGallery.skinIndex = sg.data.play.setting.handSkinIndex;
+						sg.bgGallery.skinIndex = sg.data.play.setting.bgSkinIndex;
+						sg.handGallery.updateImage(sg);
+						sg.bgGallery.updateImage(sg);
 						sg.setScene(skiScene);
+						sg.playTone();
 					}
 				});
 				
@@ -217,6 +230,7 @@ public class MenuButtons extends Entity {
 							sg.play.buttons.setState(sg.play.buttons.localMultiPlayerState);
 						}break;
 						}
+						sg.playTone();
 					}
 				});
 			}

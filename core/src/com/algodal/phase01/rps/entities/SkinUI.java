@@ -59,6 +59,7 @@ public class SkinUI extends Entity {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
 						sg.setScene(menScene);
+						sg.playTone();
 					}
 				});
 				
@@ -78,6 +79,7 @@ public class SkinUI extends Entity {
 						} else {
 							adsDialog.show(sg);
 						}
+						sg.playTone();
 					}
 				});
 			}
@@ -85,7 +87,7 @@ public class SkinUI extends Entity {
 	}
 	
 	private boolean saveOK(SubGame sg) {
-		return sg.data.menu.fullVersionPurchased || (sg.handGallery.skinIndex < 2 && sg.bgGallery.skinIndex < 2);
+		return sg.data.menu.fullVersionPurchased || (sg.handGallery.skinIndex < 3 && sg.bgGallery.skinIndex < 3);
 	}
 	
 	public class NormalState extends State {

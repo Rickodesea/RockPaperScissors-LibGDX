@@ -12,6 +12,7 @@ import com.algodal.phase01.rps.dialogs.QuickSettingDialog;
 import com.algodal.phase01.rps.entities.LockBG;
 import com.algodal.phase01.rps.entities.LockHand;
 import com.algodal.phase01.rps.helper.PlayHelper;
+import com.algodal.phase01.rps.helper.Shaders;
 import com.algodal.phase01.rps.scenes.Menu;
 import com.algodal.phase01.rps.scenes.Play;
 import com.algodal.phase01.rps.scenes.SkinSetup;
@@ -24,6 +25,8 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -74,7 +77,55 @@ public class SubGame {
 	public final PlayHelper playHelper = new PlayHelper();
 	public final Play play = new Play(); //Allow easy communication between objects.
 	
+	//Shaders
+	public final Shaders shaders;
+	
+	//Audio
+	final Sound sndClick, sndTone, sndJingle, sndDoor;
+	public final Music musEmerald, musMenu;
+	
+	public void playClick() {
+		sndClick.play(data.menu.masterVolume*data.menu.soundVolume);
+	}
+	
+	public void playTone() {
+		sndTone.play(data.menu.masterVolume*data.menu.soundVolume);
+	}
+	
+	public void playJingle() {
+		sndJingle.play(data.menu.masterVolume*data.menu.soundVolume);
+	}
+	
+	public void playDoor() {
+		sndDoor.play(data.menu.masterVolume*data.menu.soundVolume);
+	}
+	
+	public void playEmerald() {
+		musEmerald.setLooping(true);
+		musEmerald.setVolume(data.menu.masterVolume*data.menu.musicVolume);
+		musEmerald.play();
+	}
+	
+	public void playMenu() {
+		musMenu.setLooping(true);
+		musMenu.setVolume(data.menu.masterVolume*data.menu.musicVolume);
+		musMenu.play();
+	}
+	
 	public SubGame() {
+		sndClick = Gdx.audio.newSound(Gdx.files.internal(Constants.sndClick));
+		sndTone = Gdx.audio.newSound(Gdx.files.internal(Constants.sndTone));
+		sndJingle = Gdx.audio.newSound(Gdx.files.internal(Constants.sndJingle));
+		sndDoor = Gdx.audio.newSound(Gdx.files.internal(Constants.sndDoor));
+		
+		musEmerald = Gdx.audio.newMusic(Gdx.files.internal(Constants.musEmerald));
+		musMenu = Gdx.audio.newMusic(Gdx.files.internal(Constants.musMenu));
+		
+		playEmerald(); //I love both music
+		//playMenu();
+		
+		shaders = new Shaders();
+		
 		prefs = Gdx.app.getPreferences("com.algodal.phase01.rps");
 		dataLoad();
 		
@@ -83,7 +134,7 @@ public class SubGame {
 		am = new AssetManager();
 		st = new Stage(new FitViewport(worldWidth, worldHeight));
 		st.getViewport().getCamera().position.setZero();
-		st.setDebugAll(true);
+		//st.setDebugAll(true);
 		
 		cc = new Color(Color.BROWN);
 		v = new Vector2();
@@ -122,9 +173,13 @@ public class SubGame {
 	public boolean hasStartedPlaying() {
 		if(data.play.setting.completedRounds > 0) return true;
 		switch(data.menu.mode) {
-		default: return playHelper.single.location != PlayHelper.Single.Step.Player01_Get_Ready;
-		case 1: return playHelper.local.location != PlayHelper.Local.Step.Game_Intro;
+		default: return playHelper.single.location == PlayHelper.Single.Step.Player01_Playing;
+		case 1: return playHelper.local.location != PlayHelper.Local.Step.Game_Trans;
 		}
+	}
+	
+	public boolean isMatchFinished() {
+		return data.play.setting.completedRounds >= data.play.setting.maxRounds;
 	}
 	
 	public void reset() {
@@ -458,20 +513,21 @@ public class SubGame {
 				public int maxRounds = 3;
 				public int completedRounds = 0;
 				public HandSkin[] handskins = new HandSkin[] {
-						new HandSkin("rock_0", "paper_0", "scissors_0"),
 						new HandSkin("rock_1", "paper_1", "scissors_1"),
-						new HandSkin("rock_b", "paper_b", "scissors_b"),
+						new HandSkin("rock_0", "paper_0", "scissors_0"),						
+						new HandSkin("rock_2", "paper_2", "scissors_2"),
 						new HandSkin("rock_3", "paper_3", "scissors_3"),
 						new HandSkin("rock_4", "paper_4", "scissors_4"),
+						new HandSkin("rock_5", "paper_5", "scissors_5"),
 				};
 				public BackgroundSkin[] bgskins = new BackgroundSkin[] {
-						new BackgroundSkin("bg_0"),
-						new BackgroundSkin("bg_1"),
-						new BackgroundSkin("bg_2"),
+						new BackgroundSkin("bg_6"),	
+						new BackgroundSkin("bg_0"),											
 						new BackgroundSkin("bg_3"),
+						new BackgroundSkin("bg_2"),						
 						new BackgroundSkin("bg_4"),
 						new BackgroundSkin("bg_5"),
-						new BackgroundSkin("bg_6"),
+						new BackgroundSkin("bg_1"),
 						new BackgroundSkin("bg_7"),
 				};
 				public int handSkinIndex = 0, bgSkinIndex = 0;

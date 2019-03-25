@@ -27,6 +27,7 @@ private final LateInitialization lateInitialization;
 					@Override
 					protected void result(Object object) {
 						final boolean result = (Boolean)object;
+						sg.playTone();
 						switch(sg.data.menu.mode) {
 						default: {
 							if(result) {
@@ -63,6 +64,7 @@ private final LateInitialization lateInitialization;
 	@Override
 	public void show(SubGame sg) {
 		dialog.getContentTable().clear();
+		sg.playJingle();
 		
 		switch(sg.data.menu.mode) {
 		default: {

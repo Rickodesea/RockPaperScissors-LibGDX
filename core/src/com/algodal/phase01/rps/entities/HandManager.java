@@ -1,14 +1,20 @@
 package com.algodal.phase01.rps.entities;
 
+import static com.algodal.phase01.rps.Constants.defAtlas;
 import static com.algodal.phase01.rps.Constants.handHeight;
 import static com.algodal.phase01.rps.Constants.handPositions;
 import static com.algodal.phase01.rps.Constants.handWidth;
 
 import com.algodal.phase01.rps.Entity;
+import com.algodal.phase01.rps.LateInitialization;
 import com.algodal.phase01.rps.State;
 import com.algodal.phase01.rps.SubGame;
+import com.algodal.phase01.rps.Unit;
+import com.algodal.phase01.rps.helper.PlayHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -23,8 +29,13 @@ public class HandManager extends Entity {
 	
 	public final RandomXS128 random = new RandomXS128(TimeUtils.nanoTime());
 	
+	public final Unit victoryUnit = new Unit();
+	
 	public HandManager() {
 		setState(singlePlayerState);
+		
+		victoryUnit.width = handWidth * 0.25f;
+		victoryUnit.height = handHeight * 0.25f;
 		
 		hands = new Hand[] {
 			new Hand(),
@@ -56,6 +67,18 @@ public class HandManager extends Entity {
 		}
 	}
 	
+	@Override
+	public LateInitialization getLateInitialization() {
+		return new LateInitialization() {
+			
+			@Override
+			public void initialize(SubGame sg) {
+				for(Hand hand : hands) hand.getLateInitialization().initialize(sg);
+				
+			}
+		};
+	}
+	
 	public void randomize() {
 		for(Hand hand : hands) hand.index = random.nextInt(3);
 	}
@@ -64,18 +87,6 @@ public class HandManager extends Entity {
 		if(getState().equals(singlePlayerState)) {
 			for(int i = 0; i < hands.length; i++) {
 				final Hand hand = hands[i];
-				
-				/**  //Deprecated Code 
-				if(sg.player01Turn) {
-					if(i > 2 && i < 6) {
-						hand.index = random.nextInt(3);
-					}
-				} else {
-					if(i > -1 && i < 3) {
-						hand.index = random.nextInt(3);
-					}
-				}
-				**/
 				if(i > 2 && i < 6) {
 					hand.index = random.nextInt(3);
 				}
@@ -100,8 +111,61 @@ public class HandManager extends Entity {
 		}
 	}
 	
+	public void drawVictorySignal(SubGame sg, int mode) {
+		final boolean victoryShow = 
+				sg.playHelper.single.location == PlayHelper.Single.Step.Game_Reveal && mode == 0 ||
+				sg.playHelper.local.location == PlayHelper.Local.Step.Game_Reveal && mode == 1;
+		if(victoryShow) {
+			for(int i = 0; i < pairs.length; i++) {
+				final Pair pair = pairs[i];
+				switch(pair.compare()) {
+				case Pair.BottomWins:{
+					final TextureAtlas atlas = sg.get(defAtlas);
+					
+					final TextureRegion tick = atlas.findRegion("tick");
+					victoryUnit.x = pair.bottom.body.x;
+					victoryUnit.y = pair.bottom.body.y;
+					
+					sg.begin(null, null);
+					sg.draw(tick, victoryUnit);
+					sg.end();
+					
+					final TextureRegion ex = atlas.findRegion("ex");
+					victoryUnit.x = pair.top.body.x;
+					victoryUnit.y = pair.top.body.y;
+					
+					sg.begin(null, null);
+					sg.draw(ex, victoryUnit);
+					sg.end();					
+				}break;
+				case Pair.TopWins:{
+					final TextureAtlas atlas = sg.get(defAtlas);
+					
+					final TextureRegion tick = atlas.findRegion("ex");
+					victoryUnit.x = pair.bottom.body.x;
+					victoryUnit.y = pair.bottom.body.y;
+					
+					sg.begin(null, null);
+					sg.draw(tick, victoryUnit);
+					sg.end();
+					
+					final TextureRegion ex = atlas.findRegion("tick");
+					victoryUnit.x = pair.top.body.x;
+					victoryUnit.y = pair.top.body.y;
+					
+					sg.begin(null, null);
+					sg.draw(ex, victoryUnit);
+					sg.end();
+				}
+				default: continue;
+				}
+			}
+		}
+	}
+	
 	public String getRoundVictoryMsg(int mode) {
 		int player01 = 0, player02 = 0;
+		
 		for(int i = 0; i < pairs.length; i++) {
 			final Pair pair = pairs[i];
 			switch(pair.compare()) {
@@ -183,26 +247,14 @@ public class HandManager extends Entity {
 					}
 				}break;
 				case Game_Reveal : {
+					hand.coverUnit.width = 0; hand.coverUnit.height = 0;
 					hand.setState(hand.unCoveredState);
 				}break;
 				}
 				
-				/*if(sg.player01Turn) {
-					if(i > 2 && i < 6) {
-						hand.setState(hand.coveredState);
-					} else {
-						hand.setState(hand.normalState);
-					}
-				} else {
-					if(i > -1 && i < 3) {
-						hand.setState(hand.coveredState);
-					} else {
-						hand.setState(hand.normalState);
-					}
-				}*/
-				
 				hand.render(sg, delta);
 			}
+			drawVictorySignal(sg, 0);
 		}
 		
 		@Override
@@ -243,12 +295,14 @@ public class HandManager extends Entity {
 					}
 				}break;
 				case Game_Reveal : {
+					hand.coverUnit.width = 0; hand.coverUnit.height = 0;
 					hand.setState(hand.unCoveredState);
 				}break;
 				}
 				
 				hand.render(sg, delta);
 			}
+			drawVictorySignal(sg, 1);
 		}
 		
 		@Override
@@ -259,7 +313,7 @@ public class HandManager extends Entity {
 	}
 	
 	public static class Pair {
-		private final Hand top, bottom;
+		protected final Hand top, bottom;
 		public final static int TopWins = +1, BottomWins = -1, Draw = 0;
 
 		public Pair(Hand bottom, Hand top) {

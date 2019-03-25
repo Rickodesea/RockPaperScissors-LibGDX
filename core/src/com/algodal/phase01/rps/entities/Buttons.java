@@ -57,6 +57,7 @@ public class Buttons extends Entity {
 				playbtn.addListener(new ClickListener() {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
+						sg.playTone();
 						final HandManager handManager = sg.getEntity("Hand Manager");
 						
 						switch(sg.data.menu.mode) {
@@ -69,10 +70,11 @@ public class Buttons extends Entity {
 								handManager.randomizeRequiredOnly(sg);
 								handManager.compare();
 								handManager.compare(sg);
-								sg.playHelper.single.location = PlayHelper.Single.Step.Game_Reveal;
-							}break;
-							case Game_Reveal : {
 								sg.data.play.setting.completedRounds ++;
+								sg.playHelper.single.location = PlayHelper.Single.Step.Game_Reveal;
+								sg.playDoor();
+							}break;
+							case Game_Reveal : {									
 								if(sg.data.play.setting.completedRounds >= sg.data.play.setting.maxRounds) {
 									System.out.println("Game has ended.");
 									if(sg.data.play.player01.scoreAmount > sg.data.play.player02.scoreAmount) System.out.println("Player 1 wins.");
@@ -98,12 +100,13 @@ public class Buttons extends Entity {
 								sg.playHelper.local.location = PlayHelper.Local.Step.Player02_Playing;
 							}break;
 							case Player02_Playing: {
-								sg.playHelper.local.location = PlayHelper.Local.Step.Game_Reveal;
-							}break;
-							case Game_Reveal : {
 								sg.play.handManager.compare();
 								sg.play.handManager.compare(sg);
 								sg.data.play.setting.completedRounds ++;
+								sg.playHelper.local.location = PlayHelper.Local.Step.Game_Reveal;
+								sg.playDoor();
+							}break;
+							case Game_Reveal : {									
 								if(sg.data.play.setting.completedRounds >= sg.data.play.setting.maxRounds) {
 									System.out.println("Game has ended.");
 									if(sg.data.play.player01.scoreAmount > sg.data.play.player02.scoreAmount) System.out.println("Player 1 wins.");
@@ -148,6 +151,7 @@ public class Buttons extends Entity {
 						} else {
 							homeRunnable.run();
 						}
+						sg.playTone();
 					}
 				});
 				
@@ -173,6 +177,7 @@ public class Buttons extends Entity {
 						} else {
 							resetRunnable.run();
 						}
+						sg.playTone();
 					}
 				});
 				
@@ -198,6 +203,7 @@ public class Buttons extends Entity {
 						} else {
 							qsetRunnable.run();
 						}
+						sg.playTone();
 					}
 				});
 				
@@ -259,7 +265,11 @@ public class Buttons extends Entity {
 				}break;
 				case Game_Reveal : {
 					message.actor(Label.class).setText(sg.play.handManager.getRoundVictoryMsg(0));
-					playbtn.setText("Next Round");
+					if(sg.isMatchFinished()) {
+						playbtn.setText("End Match");
+					} else {
+						playbtn.setText("Next Round");
+					}
 				}break;
 				}
 			}
@@ -292,7 +302,8 @@ public class Buttons extends Entity {
 			sg.st.act();
 			sg.st.draw();
 			
-			switch(sg.data.menu.mode) {
+			/*  //Shouldn't need this since the GameStates are set base on the mode
+			 * switch(sg.data.menu.mode) {
 			default: {
 				switch(sg.playHelper.single.location) {
 				case Player01_Get_Ready : {
@@ -329,8 +340,39 @@ public class Buttons extends Entity {
 				}break;
 				case Game_Reveal : {
 					message.actor(Label.class).setText(sg.play.handManager.getRoundVictoryMsg(1));
-					playbtn.setText("Next Round");
+					if(sg.isMatchFinished()) {
+						playbtn.setText("End Match");
+					} else {
+						playbtn.setText("Next Round");
+					}
 				}break;
+				}
+			}break;
+			}*/
+			
+			switch(sg.playHelper.local.location) {
+			case Game_Intro : {
+				message.actor(Label.class).setText("P1 (bottom) v P2 (top) On Same Device.");
+				playbtn.setText("Start");
+			}break;
+			case Player01_Playing: {
+				message.actor(Label.class).setText("P1 Turn.");
+				playbtn.setText("P1 - Done");
+			}break;
+			case Game_Trans: {
+				message.actor(Label.class).setText("Hand Device to Next Player.");
+				playbtn.setText("Next Player");
+			}break;
+			case Player02_Playing: {
+				message.actor(Label.class).setText("P2 (top) Turn.");
+				playbtn.setText("P2 - Done");
+			}break;
+			case Game_Reveal : {
+				message.actor(Label.class).setText(sg.play.handManager.getRoundVictoryMsg(1));
+				if(sg.isMatchFinished()) {
+					playbtn.setText("End Match");
+				} else {
+					playbtn.setText("Next Round");
 				}
 			}break;
 			}

@@ -35,6 +35,7 @@ public class QuickSettingDialog implements IDialog {
 				dialog = new Dialog("Setting", (Skin) sg.get(defSkin)) {
 					@Override
 					protected void result(Object object) {
+						sg.playTone();
 						final boolean result = (Boolean)object;
 						if(result) {
 							sg.data.play.setting.maxRounds = (int)slider.getValue();

@@ -48,7 +48,7 @@ protected final Unit body;
 			final TextureRegion tr = atlas.findRegion("lock_0");
 			
 			if(!sg.data.menu.fullVersionPurchased) {
-				if(index > 1) {
+				if(index > 2) {
 					sg.begin(null, null);
 					sg.draw(tr, body);
 					sg.end();
